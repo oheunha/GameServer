@@ -10,22 +10,42 @@ class SpinLock
 public:
     void lock()
     { 
-        while (_locked)
+        // CAS ( Compare-And-Swap )
+
+        bool expected = false;
+        bool desired = true;
+
+        // CAS 의사 코드
+        /*
+        if (_locked == expected)
         {
-
+            expected = _locked;
+            _locked = desired;
+            return true;
         }
-
-        _locked = true;
+        else
+        {
+            expected = _locked;
+            return false;
+        }
+        */
+        
+        while (false == _locked.compare_exchange_strong(expected, desired)) // atomic 한 함수 
+        {
+            expected = false;
+        }
+        
     }
 
     void unlock()
     {
-        _locked = false;
+        //_locked = false;
+        _locked.store(false);
 
     }
 
 private:
-    volatile bool _locked = false;
+    atomic<bool> _locked = false;
 
 
 };
