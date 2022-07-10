@@ -14,14 +14,14 @@ void Producer()
 {
     value = 10;
 
-    ready.store(true, memory_order::memory_order_release);
+    ready.store(true);
     // ------------------절취선 위로 보장---------------------
 }
 
 void Consumer()
 {
     // ------------------절취선 아래로 보장---------------------
-    while (ready.load(memory_order::memory_order_acquire) == false)
+    while (ready.load() == false)
         ;
 
     cout << value << endl;
@@ -57,4 +57,7 @@ int main()
 
     // 인텔, AMD의 경우 애당초 순차적 일관성을 보장을 해서,
     // seq_cst를 써도 별다른 부하가 없음
+    // ARM의 경우 꽤 차이가 있다!
+
+
 }
