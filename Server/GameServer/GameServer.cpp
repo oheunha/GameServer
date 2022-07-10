@@ -13,8 +13,9 @@ int32 value;
 void Producer()
 {
     value = 10;
-
     ready.store(true);
+
+    //std::atomic_thread_fence(memory_order::memory_order_release); 내용이 store에 포함됨
     // ------------------절취선 위로 보장---------------------
 }
 
