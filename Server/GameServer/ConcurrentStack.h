@@ -52,7 +52,7 @@ class LockFreeStack
 {
 	struct Node
 	{
-		Node(const T& value) : data(value)
+		Node(const T& value) : data(value), next(nullptr)
 		{
 
 		}
@@ -65,25 +65,11 @@ public:
 	// 1) 새 노드를 만들고
 	// 2) 새 노드의 next = head
 	// 3) head = 새 노드
-	// [value][][][][][]
-	// [head]
 	void Push(const T& value)
 	{
 		Node* node = new Node(value);
 		node->next = _head;
-		
-		/*
-			if (_head == node->next)
-			{
-				_head = node;
-				return true;
-			}
-			else
-			{
-				node->next = _head;
-				return false;
-			}
-		*/
+	
 		while (_head.compare_exchange_weak(node->next, node) == false)
 		{
 			// node->next = _head;
@@ -99,47 +85,113 @@ public:
 	// 3) head = head->next
 	// 4) data 추출해서 반환
 	// 5) 추출한 노드를 삭제
-	
-	// [][][][][][]
-	// [head]
 	bool TryPop(T& value)
 	{
+		++_popCount;
+
 		Node* oldHead = _head;
 		
-		/*
-		if (_head == oldHead)
-		{
-			_head = oldHead->next;
-			return true;
-		}
-		else
-		{
-			oldHead = _head;
-			return false;
-		}
-		*/
 		while (oldHead && _head.compare_exchange_weak(oldHead, oldHead->next) == false)
 		{
-			//oldHead = _head;
 		}
 		
 		if (oldHead == nullptr)
 		{
+			--_popCount;
+
 			return false;
 		}
+		
 
-		// Exception X
 		value = oldHead->data;
-		
-		// 잠시 삭제 보류
-		//delete oldHead;
-
-		
+		TryDelete(oldHead);
 		return true;
+
+	}
+
+	// 1) 데이터 분리
+	// 2) Count 체크
+	// 3) 나 혼자만 삭제
+	void TryDelete( Node* oldHead )
+	{
+		// 나 외에 누가 있는지?
+		if (_popCount == 1)
+		{
+			// 나 혼자네?
+
+			// 이왕 혼자인거, 삭제 예약된 다른 데이터들도 삭제해보자
+			Node* node = _pendingList.exchange(nullptr);
+
+			if (--_popCount == 0) // 아토믹하게 이루어짐! 빼고 겟하는게 아니라 빼면서 결과값을 뱉어내는것이 원자적으로 이루어짐
+			{
+				// 끼어든 애가 없음 -> 삭제 진행
+				// 이제와서 끼어들어도, 어차피 데이터는 분리해둔 상태~!
+				DeleteNodes(node);
+			}
+			else if(node)
+			{
+				// 누가 끼어들엇으니 다시 갖다 놓자.
+				ChangePendingNodeList(node);
+			}
+			 
+			// 내 데이터는 삭제
+			delete oldHead;
+
+		}
+		else
+		{
+			// 누가 있네? 그럼 지금 삭제하지 않고, 삭제 예약만
+			ChangePendingNodeList(oldHead);
+			--_popCount;
+		}
+	
+	}
+
+	// [][][][][][] -> [][][][] 
+
+	void ChangePendingNodeList(Node* first, Node* last) // 중간에 아무도 안끼어들었다면 이어준다 + _pendingList의 맨 처음을 가리키기
+	{
+		last->next = _pendingList;
+		while (_pendingList.compare_exchange_weak(last->next, first) == false)
+		{
+
+		}
+
+	}
+
+	void ChangePendingNodeList(Node* node) // 맨 앞을 가리키며, 맨 마지막 노드를 찾아주는 helper함수
+	{
+		Node* last = node;
+		while (last->next)
+		{
+			last = last->next;
+		}
+
+		ChangePendingNodeList(node, last);
+	}
+
+	void ChangePendingNode(Node* node) // 하나짜리
+	{
+		ChangePendingList(node, node);
+	}
+
+	static void DeleteNodes(Node* node)
+	{
+		while (node)
+		{
+			Node* next = node->next;
+			delete node;
+			node = next;
+
+		}
 	}
 
 private:
 	// [][][][][][]
 	// [head]
 	atomic<Node*> _head;
+	
+	atomic<uint32> _popCount = 0; // Pop을 실행중인 쓰레드 개수
+	atomic<Node*> _pendingList; // 삭제 되어야 할 노드들 (첫번째 노드)
+
 };
