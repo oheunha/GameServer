@@ -84,7 +84,7 @@ public:
 				return false;
 			}
 		*/
-		while (_head.compare_exchange_weak(node->next, _head) == false)
+		while (_head.compare_exchange_weak(node->next, node) == false)
 		{
 			// node->next = _head;
 		}
