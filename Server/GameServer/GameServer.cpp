@@ -46,7 +46,7 @@ int main()
         
        /*
             // 1ms를 줄테니 그동안 일을 끝냈는지 확인
-            std::future_status status = future.wait_for(1ms);
+            std::future_status status = future.wait_for(1ms); 
             if (status == future_status::ready) // 일감이 완료된 상태라면
             {
                 // ...
@@ -99,3 +99,14 @@ int main()
     }
 
 }
+
+// 결론)
+// mutex, condition_variable까지 가지 않고 단순한 애들을 처리할 수 있는
+// 특히나, 한 번 발생하는 이벤트에 유용하다!
+// 닭잡는데 소잡는 칼을 쓸 필요 없다!
+// 1) async ( 종종 사용 )
+// 원하는 함수를 비동기적으로 실행
+// 2) promise
+// 결과물을 promise를 통해 future로 받아줌
+// 3) packaged_task
+// 원하는 함수의 실행 결과를 packaged_task를 통해 future로 받아줌!
