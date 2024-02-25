@@ -9,3 +9,4 @@ Server/.vs/Server/v17/
 *.obj
 *.recipe
 *.exe
+*.vsidx
