@@ -7,7 +7,7 @@
 ----------------*/
 
 /*---------------------------------------------------
-	[\\\\\\\\][\\\\\\\\][RRRRRRRR][RRRRRRRR]
+	[WWWWWWWW][WWWWWWWW][RRRRRRRR][RRRRRRRR]
 	W : WriteFlag (Exclusive Lock Owner ThreadId)
 	R : ReadFlag (Shared Lock Count)
 ----------------------------------------------------*/
