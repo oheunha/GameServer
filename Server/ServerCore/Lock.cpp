@@ -1,8 +1,13 @@
 ﻿#include "pch.h"
 #include "Lock.h"
+#include "DeadLockProfiler.h"
 
-void Lock::WriteLock()
+void Lock::WriteLock(const char* name)
 {
+#if _DEBUG
+	GDeadLockProfiler->PushLock(name);
+#endif
+
 	// 동일한 쓰레드가 소유하고 있다면 무조건 성공
 	const uint32 lockThreadId = (_lockFlag.load() & WRITE_THREAD_MASK) >> 16; // 상위 16비트만 남기고 0으로 밀어버린 후, 해당 값을 다시 오른쪽으로 밀어서 스레드 아이디 가져옴
 	if (LThreadId == lockThreadId)
@@ -35,8 +40,12 @@ void Lock::WriteLock()
 	}
 }
 
-void Lock::WriteUnlock()
+void Lock::WriteUnlock(const char* name)
 {
+#if _DEBUG
+	GDeadLockProfiler->PopLock(name);
+#endif
+
 	// ReadLock 다 풀기 전에는 WriteUnlock 불가능.
 	if ((_lockFlag.load() & READ_COUNT_MASK) != 0)
 	{
@@ -50,8 +59,12 @@ void Lock::WriteUnlock()
 	}
 }
 
-void Lock::ReadLock()
+void Lock::ReadLock(const char* name)
 {
+#if _DEBUG
+	GDeadLockProfiler->PushLock(name);
+#endif
+
 	// 동일한 쓰레드가 소유하고 있다면 무조건 성공
 	const uint32 lockThreadId = (_lockFlag.load() & WRITE_THREAD_MASK) >> 16; // 상위 16비트만 남기고 0으로 밀어버린 후, 해당 값을 다시 오른쪽으로 밀어서 스레드 아이디 가져옴
 	if (LThreadId == lockThreadId)
@@ -84,8 +97,12 @@ void Lock::ReadLock()
 	}
 }
 
-void Lock::ReadUnlock()
+void Lock::ReadUnlock(const char* name)
 {
+#if _DEBUG
+	GDeadLockProfiler->PopLock(name);
+#endif
+
 	// fetch_sub은 1을 빼되, 그 이전값을 뱉어준다.
 	if ((_lockFlag.fetch_sub(1) & READ_COUNT_MASK) == 0) // 이전값이 0이었다. ReadLock 하기 전에 언락이 호출되었을 상황
 	{
