@@ -10,83 +10,66 @@
 #include "ThreadManager.h"
 #include "RefCounting.h"
 
-class Wraight : public RefCountable
+using KnightRef = TSharedPtr<class Knight>;
+using InventoryRef = TSharedPtr<class Inventory>;
+
+class Knight : public RefCountable
 {
 public:
-	int _hp = 150;
-	int _posX = 0;
-	int _posY = 0;
+	Knight()
+	{
+		cout << "Knight()" << endl;
+	}
+
+	~Knight()
+	{
+		cout << "~Knight()" << endl;
+	}
 };
-using WraightRef = TSharedPtr<Wraight>;
-
-class Missile : public RefCountable
-{
-public:
-	void SetTarget(WraightRef target)
-	{
-		_target = target;
-		// 중간에 다른 스레드가 개입 가능
-		//target->AddRef();
-		Test(target);
-	}
-
-	void Test(WraightRef& target) // 참조넘기면 카운트 안올라감
-	{
-
-	}
-
-	bool Update()
-	{
-		if (_target == nullptr)
-			return true;
-
-		int posX = _target->_posX;
-		int posY = _target->_posY;
-
-		// TODO : 쫓아간다.
-
-		if (_target->_hp == 0)
-		{
-			_target->ReleaseRef();
-			_target = nullptr;
-			return true;
-		}
-		return false;
-	}
-	WraightRef _target = nullptr;
-};
-
-using MissileRef = TSharedPtr<Missile>;
-
 
 int main()
 {
-	WraightRef wraight (new Wraight());
-	wraight->ReleaseRef();
-	MissileRef missile (new Missile());
-	missile->ReleaseRef();
+	// 1) 이미 만들어진 클래스 대상으로 사용 불가
+	// 2) 순환 (Cycle) 문제
+	
+	
 
-	missile->SetTarget(wraight);
+	// shared_ptr
+	// weak_ptr
+	
+	// [Knight | RefCountingBlock(uses, weak)]
+	
+	// [T*][RefCountBlock*]
 
-	// 레이스가 피격 당함
-	wraight->_hp = 0;
-	// delete wraight;
-	//wraight->ReleaseRef();
-	wraight = nullptr;
+	// RefCountBlock(useCount(shared(0)), weakCount(2))
+	shared_ptr<Knight> spr = make_shared<Knight>();
+	weak_ptr<Knight> wpr = spr; // 수명주기엔 영향안줌
 
-	while (true)
+	bool expired = wpr.expired(); // Knight 아직 유효하니?
+	shared_ptr<Knight> spr2 = wpr.lock(); // weak포인터가 shared포인터로 변신
+	if (spr2 != nullptr)
 	{
-		if (missile)
-		{
-			if (missile->Update())
-			{
-				missile->ReleaseRef();
-				missile = nullptr;
-			}
-		}
+
 	}
 
-	missile->ReleaseRef();
-	missile = nullptr;
-	//delete missile;
+
+
+	// unique_ptr : 알아서 삭제 / 복사 막아둠
+	unique_ptr<Knight> k2 = make_unique<Knight>();
+	unique_ptr<Knight> k3 = std::move(k2);
+
+	// 예제1)
+	//KnightRef k1(new Knight());
+	//k1->ReleaseRef();
+	//KnightRef k2(new Knight());
+	//k2->ReleaseRef();
+	//
+	//k1->SetTarget(k2);
+	//k2->SetTarget(k1);
+	//
+	//k2->SetTarget(nullptr);
+	//k1->SetTarget(nullptr);
+	//
+	//k1 = nullptr;
+	//k2 = nullptr;
 }
