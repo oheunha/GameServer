@@ -7,9 +7,6 @@
     <Filter Include="Utils">
       <UniqueIdentifier>{794e57aa-e68b-4afb-990a-7e7f42bf9a2b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Memory">
-      <UniqueIdentifier>{7e36564b-7ac4-4ac9-8650-d774a86431b6}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -24,15 +21,6 @@
     <ClCompile Include="ConcurrentStack.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="RefCounting.cpp">
-      <Filter>Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="Allocator.cpp">
-      <Filter>Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="Memory.cpp">
-      <Filter>Memory</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -43,15 +31,6 @@
     </ClInclude>
     <ClInclude Include="ConcurrentStack.h">
       <Filter>Main</Filter>
-    </ClInclude>
-    <ClInclude Include="RefCounting.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="Allocator.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="Memory.h">
-      <Filter>Memory</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

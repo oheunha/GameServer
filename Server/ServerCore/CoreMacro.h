@@ -1,10 +1,9 @@
 #pragma once
-
 #define OUT
 
-/*----------------
-	Lock
-----------------*/
+	/*----------------
+		Lock
+	----------------*/
 
 #define USE_MANY_LOCKS(count) Lock _locks[count];
 #define USE_LOCK USE_MANY_LOCKS(1)
@@ -13,19 +12,19 @@
 #define WRITE_LOCK_IDX(idx) WriteLockGuard writeLockGuard_##idx(_locks[idx], typeid(this).name());
 #define WRITE_LOCK WRITE_LOCK_IDX(0)
 
-/*----------------
-	Lock
-----------------*/
+	/*----------------
+		Lock
+	----------------*/
 #ifdef _DEBUG
-#define xalloc(size) BaseAllocator::Alloc(size)
+#define xAlloc(size) BaseAllocator::Alloc(size)
 #define xrelease(ptr) BaseAllocator::Release(ptr)
 #else
-#define xalloc(size) BaseAllocator::Alloc(size)
+#define xAlloc(size) BaseAllocator::Alloc(size)
 #define xrelease(ptr) BaseAllocator::Release(ptr)
 #endif
-/*----------------
-	Crash 
-----------------*/
+	/*----------------
+		Crash
+	----------------*/
 
 #define CRASH(cause)						\
 {											\
