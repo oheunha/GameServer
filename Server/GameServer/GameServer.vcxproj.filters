@@ -21,6 +21,9 @@
     <ClCompile Include="ConcurrentStack.cpp">
       <Filter>Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\ServerCore\LockFreeStack.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -30,6 +33,9 @@
       <Filter>Main</Filter>
     </ClInclude>
     <ClInclude Include="ConcurrentStack.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ServerCore\LockFreeStack.h">
       <Filter>Main</Filter>
     </ClInclude>
   </ItemGroup>

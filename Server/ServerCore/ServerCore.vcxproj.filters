@@ -57,7 +57,9 @@
     <ClInclude Include="RefCounting.h">
       <Filter>Memory</Filter>
     </ClInclude>
-    <ClInclude Include="MemoryPool.h" />
+    <ClInclude Include="MemoryPool.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CorePch.cpp">
@@ -90,6 +92,8 @@
     <ClCompile Include="RefCounting.cpp">
       <Filter>Memory</Filter>
     </ClCompile>
-    <ClCompile Include="MemoryPool.cpp" />
+    <ClCompile Include="MemoryPool.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
